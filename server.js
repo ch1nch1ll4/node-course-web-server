@@ -1,11 +1,14 @@
 const express = require('express');
 const hbs = require('hbs');
 const fs = require('fs');
+const port = process.env.PORT || 3000;
 
 var app = express();
-
-hbs.registerPartials(__dirname + '/views/partials')
 app.set('view engine', 'hbs');
+
+
+//hadlebars partials
+hbs.registerPartials(__dirname + '/views/partials')
 
 //handlebars helpers
 hbs.registerHelper('getCurrentYear', () => {
@@ -15,8 +18,10 @@ hbs.registerHelper('screamIt', (text) => {
   return text.toUpperCase();
 });
 
+
+
 //register middelware (order is important)
-app.use((req, res, next) => {
+app.use((req, res, next) => {                         //writing logfile
   var now = new Date().toString();
   var log = `${now}: ${req.method} ${req.url}`;
 
@@ -28,12 +33,14 @@ app.use((req, res, next) => {
   });
   next();
 });
-app.use((req, res, next) => {
-  res.render('maintenance.hbs');
-});
-app.use(express.static(__dirname + '/public'));
+// app.use((req, res, next) => {                      //maintenance page
+//   res.render('maintenance.hbs');
+// });
+app.use(express.static(__dirname + '/public'));       //serve html page
 
-//https get requests
+
+
+//handlers for https get requests
 app.get('/', (req, res) => {
   // res.send('<h1>Hello Express!<h1>');
   // res.send({
@@ -61,6 +68,6 @@ app.get('/bad', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server is up on port 3000');
+app.listen(port, () => {
+  console.log(`Server is up on port ${port}`);
 });
